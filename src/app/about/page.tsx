@@ -69,12 +69,12 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <dl className="grid grid-cols-2 gap-8 self-start rounded-2xl border border-ink-line bg-ink-raised p-8">
-              <Stat value="2019" label="Founded" />
+            {/* <dl className="grid grid-cols-2 gap-8 self-start rounded-2xl border border-ink-line bg-ink-raised p-8">
+              <Stat value="2026" label="Founded" />
               <Stat value="40+" label="Brands served" />
               <Stat value="180+" label="Ads shipped last year" />
               <Stat value="11" label="People on the team" />
-            </dl>
+            </dl> */}
           </div>
         </Container>
       </Section>

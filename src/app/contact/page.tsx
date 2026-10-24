@@ -47,14 +47,6 @@ export default function ContactPage() {
                       {site.email}
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      href={`tel:${site.phone.replace(/[^+\d]/g, "")}`}
-                      className="text-brand-bright hover:underline"
-                    >
-                      {site.phone}
-                    </Link>
-                  </li>
                   <li className="text-ash">{site.address}</li>
                 </ul>
               </div>

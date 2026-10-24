@@ -6,7 +6,7 @@ export const site = {
   url: "https://madvertize.com",
   email: "miru@madvertize.com",
   phone: "+1 (555) 014-2200",
-  address: "Remote-first — serving brands across North America",
+  address: "Remote-first — serving brands across The Netherlands",
   socials: [
     { label: "Instagram", href: "https://instagram.com/" },
     { label: "LinkedIn", href: "https://linkedin.com/" },
@@ -16,7 +16,7 @@ export const site = {
 
 export const nav = [
   { label: "Services", href: "/services" },
-  { label: "Work", href: "/work" },
+  // { label: "Work", href: "/work" },
   { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/about" },
 ] as const;
@@ -253,55 +253,68 @@ export const testimonials = [
   },
 ] as const;
 
-export const plans = [
+export type Plan = {
+  name: string;
+  price: string;
+  cadence: string;
+  blurb: string;
+  features: string[];
+  cta: string;
+  featured: boolean;
+  note?: string;
+};
+
+export const plans: Plan[] = [
   {
     name: "Starter",
-    price: "$2,500",
+    price: "€650",
     cadence: "per month",
     blurb: "For a first real test of paid social, with creative good enough to judge it by.",
     features: [
       "4 video ads per month",
       "2 flyer or print pieces",
-      "Meta Ads management up to $10k spend",
+      "Meta Ads management for €300–€10k monthly spend",
       "Tracking setup and verification",
       "Monthly strategy call",
     ],
     cta: "Start here",
     featured: false,
+    note: "Ad spend of €300–€10.000 a month is separate, paid by you directly to Meta.",
   },
   {
     name: "Growth",
-    price: "$5,500",
+    price: "€1.250",
     cadence: "per month",
     blurb: "The main engagement: enough creative volume to keep a testing cadence alive.",
     features: [
       "10 video ads per month",
+      "Miru films on site at your company in the Netherlands",
       "Unlimited print requests in queue",
-      "Meta Ads management up to $50k spend",
+      "Meta Ads management up to €50k spend",
       "Creative strategy and hook development",
       "Weekly reporting and call",
       "Landing-page review",
     ],
     cta: "Most teams pick this",
     featured: true,
+    note: "Ad spend of €1.000–€50.000 a month is separate, paid by you directly to Meta.",
   },
   {
     name: "Scale",
     price: "Custom",
     cadence: "quoted per quarter",
-    blurb: "For multi-location brands and accounts spending past $50k a month.",
+    blurb: "For multi-location brands and accounts spending past €50k a month.",
     features: [
       "Dedicated creative pod",
       "On-site production days",
       "Multi-location creative systems",
       "Expanded channels beyond Meta",
       "Quarterly planning workshops",
-      "Shared Slack channel",
     ],
     cta: "Talk to us",
     featured: false,
   },
-] as const;
+];
 
 export const faqs = [
   {

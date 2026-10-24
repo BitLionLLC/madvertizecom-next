@@ -63,10 +63,10 @@ function Hero() {
             <ButtonLink href="/contact" size="lg">
               Book a free strategy call
             </ButtonLink>
-            <ButtonLink href="/work" variant="outline" size="lg">
+            {/* <ButtonLink href="/work" variant="outline" size="lg">
               See the work
               <ArrowIcon className="size-4" />
-            </ButtonLink>
+            </ButtonLink> */}
           </div>
 
           <ul className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-ash">
@@ -180,10 +180,10 @@ function WorkPreview() {
             title="Receipts, not a reel"
             className="sm:max-w-xl"
           />
-          <ButtonLink href="/work" variant="outline">
+          {/* <ButtonLink href="/work" variant="outline">
             All case studies
             <ArrowIcon className="size-4" />
-          </ButtonLink>
+          </ButtonLink> */}
         </div>
 
         <div className="mt-14 grid gap-5 lg:grid-cols-3">

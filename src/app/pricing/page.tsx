@@ -55,6 +55,12 @@ export default function PricingPage() {
                   <span className="text-sm text-ash">{plan.cadence}</span>
                 </p>
 
+                {plan.note ? (
+                  <p className="mt-3 text-sm leading-relaxed text-ash">
+                    {plan.note}
+                  </p>
+                ) : null}
+
                 <ul className="mt-8 flex flex-1 flex-col gap-4 border-t border-ink-line pt-7">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">

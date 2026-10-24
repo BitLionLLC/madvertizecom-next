@@ -34,9 +34,6 @@ export function SiteFooter() {
 
           <FooterColumn title="Get in touch">
             <FooterLink href={`mailto:${site.email}`}>{site.email}</FooterLink>
-            <FooterLink href={`tel:${site.phone.replace(/[^+\d]/g, "")}`}>
-              {site.phone}
-            </FooterLink>
             {site.socials.map((social) => (
               <FooterLink key={social.label} href={social.href}>
                 {social.label}

@@ -11,8 +11,8 @@ export function CtaBand() {
       />
       <Container className="relative py-20 text-center sm:py-24">
         <h2 className="headline mx-auto max-w-3xl text-4xl sm:text-5xl lg:text-6xl">
-          Let&apos;s make the ad that
-          <span className="text-brand"> finally works</span>
+          Let&apos;s make the ad
+          <span className="text-brand"> mad good</span>
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ash">
           Book a free 45-minute strategy call. You leave with a written take on
