@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { submitEnquiry } from "@/app/contact/actions";
 import { CheckIcon } from "@/components/icons";
 import { Button } from "@/components/ui";
@@ -19,11 +19,35 @@ const budgets = [
 const fieldClass =
   "w-full rounded-xl border border-ink-line bg-ink px-4 py-3 text-base text-bone placeholder:text-ash/60 focus:border-brand focus:outline-none";
 
+const emptyValues = {
+  name: "",
+  email: "",
+  company: "",
+  budget: "",
+  message: "",
+};
+
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(
     submitEnquiry,
     initialEnquiryState,
   );
+
+  // React resets an uncontrolled form once the action settles, which would
+  // throw away everything typed whenever a submission comes back with an
+  // error. Holding the values here keeps them through a failed attempt.
+  const [values, setValues] = useState(emptyValues);
+  const [interests, setInterests] = useState<string[]>([]);
+
+  const set = (field: keyof typeof emptyValues) => (value: string) =>
+    setValues((current) => ({ ...current, [field]: value }));
+
+  const toggleInterest = (name: string) =>
+    setInterests((current) =>
+      current.includes(name)
+        ? current.filter((item) => item !== name)
+        : [...current, name],
+    );
 
   if (state.status === "success") {
     return (
@@ -41,6 +65,18 @@ export function ContactForm() {
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-6">
+      {/* Honeypot: hidden from people, irresistible to bots. */}
+      <div aria-hidden className="hidden">
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Your name" name="name" error={state.fieldErrors?.name}>
           <input
@@ -50,6 +86,8 @@ export function ContactForm() {
             autoComplete="name"
             required
             placeholder="Alex Rivera"
+            value={values.name}
+            onChange={(event) => set("name")(event.target.value)}
             className={fieldClass}
           />
         </Field>
@@ -62,6 +100,8 @@ export function ContactForm() {
             autoComplete="email"
             required
             placeholder="alex@yourbrand.com"
+            value={values.email}
+            onChange={(event) => set("email")(event.target.value)}
             className={fieldClass}
           />
         </Field>
@@ -73,6 +113,8 @@ export function ContactForm() {
             type="text"
             autoComplete="organization"
             placeholder="Your Brand Co."
+            value={values.company}
+            onChange={(event) => set("company")(event.target.value)}
             className={fieldClass}
           />
         </Field>
@@ -81,7 +123,8 @@ export function ContactForm() {
           <select
             id="budget"
             name="budget"
-            defaultValue=""
+            value={values.budget}
+            onChange={(event) => set("budget")(event.target.value)}
             className={cn(fieldClass, "appearance-none")}
           >
             <option value="" disabled>
@@ -110,6 +153,8 @@ export function ContactForm() {
                 type="checkbox"
                 name="interests"
                 value={service.name}
+                checked={interests.includes(service.name)}
+                onChange={() => toggleInterest(service.name)}
                 className="size-4 accent-brand"
               />
               {service.name}
@@ -129,6 +174,8 @@ export function ContactForm() {
           rows={5}
           required
           placeholder="We sell a subscription coffee box, mostly to people who already own a grinder. We have tried boosting posts but never run a real campaign."
+          value={values.message}
+          onChange={(event) => set("message")(event.target.value)}
           className={cn(fieldClass, "resize-y")}
         />
       </Field>

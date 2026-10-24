@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   env: {
     buildYear: String(new Date().getFullYear()),
   },
+  // nodemailer uses Node built-ins and dynamic requires; keep it out of the
+  // server bundle and let Node require it directly.
+  serverExternalPackages: ["nodemailer"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

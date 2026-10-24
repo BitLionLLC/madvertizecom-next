@@ -56,14 +56,42 @@ Geist.
   client results. Replace them with your own before publishing.
 - **Contact details.** `site.email`, `site.phone`, `site.address`, `site.url`
   and the social links are placeholders.
-- **Form delivery.** `submitEnquiry` in
-  [`src/app/contact/actions.ts`](src/app/contact/actions.ts) validates the
-  submission and then logs it. Wire the marked spot to your email service, CRM
-  or database. Consider adding spam protection at the same time.
+- **Spam.** The form has a honeypot field, which stops naive bots. If the
+  volume of junk becomes a problem, add a rate limit or a captcha.
 - **Images.** The site is type- and layout-led, with the brand marks in
   `public/` (`mad.png`, `madvertize.png`, `vertize.png`) used for the nav,
   footer and app icon. Add an `opengraph-image` in `src/app/` so links shared on
   social show a branded card.
+
+## Contact form
+
+Submissions go to `miru@madvertize.com` over SMTP. `submitEnquiry` in
+[`src/app/contact/actions.ts`](src/app/contact/actions.ts) validates the form
+and hands it to [`src/lib/mail.ts`](src/lib/mail.ts), which sends through
+Nodemailer. The email's `Reply-To` is the sender's address, so replying from
+the inbox goes straight back to them.
+
+Copy `.env.example` to `.env.local` (or `.env`) and fill in the mailbox
+settings:
+
+| Variable        | Required | Notes                                                    |
+| --------------- | -------- | -------------------------------------------------------- |
+| `SMTP_HOST`     | yes      | Mail host for the domain                                   |
+| `SMTP_PORT`     | no       | Defaults to `587`                                          |
+| `SMTP_USER`     | yes      | Usually the full mailbox address                           |
+| `SMTP_PASSWORD` | yes      | Mailbox or app password                                    |
+| `SMTP_SECURE`   | no       | Defaults to `true` on port 465, `false` otherwise          |
+| `SMTP_FROM`     | no       | Defaults to `SMTP_USER`; most hosts require it to match    |
+| `ENQUIRY_TO`    | no       | Defaults to `miru@madvertize.com`                          |
+
+These are read at request time, so changing them needs a restart but not a
+rebuild. Never commit the filled-in file — `.gitignore` covers `.env*` and
+allows only `.env.example` through.
+
+If a send fails, the form tells the sender to email directly and the error is
+logged server-side; nothing is silently dropped. With no SMTP credentials set,
+`next dev` logs the enquiry instead of sending so the flow can be exercised
+locally, while production returns the error.
 
 ## Notes on Next.js 16
 

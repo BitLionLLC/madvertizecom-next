@@ -4,7 +4,7 @@ export const site = {
   description:
     "Madvertize is a creative and paid-social agency. We produce the video and print material your brand needs, then run the Meta Ads that put it in front of buyers.",
   url: "https://madvertize.com",
-  email: "hello@madvertize.com",
+  email: "miru@madvertize.com",
   phone: "+1 (555) 014-2200",
   address: "Remote-first — serving brands across North America",
   socials: [
