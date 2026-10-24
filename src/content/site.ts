@@ -8,9 +8,9 @@ export const site = {
   phone: "+1 (555) 014-2200",
   address: "Remote-first — serving brands across The Netherlands",
   socials: [
-    { label: "Instagram", href: "https://instagram.com/" },
-    { label: "LinkedIn", href: "https://linkedin.com/" },
-    { label: "YouTube", href: "https://youtube.com/" },
+    { label: "Instagram", href: "https://www.instagram.com/madvertize_" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/milanr-kniest" },
+    { label: "YouTube", href: "https://www.youtube.com/@MADvertize" },
   ],
 } as const;
 
@@ -266,6 +266,19 @@ export type Plan = {
 
 export const plans: Plan[] = [
   {
+    name: "Content",
+    price: "€450",
+    cadence: "per month",
+    blurb: "Creative production only — we make the ads, you run them wherever you like.",
+    features: [
+      "2 video ads per month",
+      "1 flyer or print piece",
+      "10 revisions per month",
+    ],
+    cta: "Just the creative",
+    featured: false,
+  },
+  {
     name: "Starter",
     price: "€650",
     cadence: "per month",
@@ -279,7 +292,7 @@ export const plans: Plan[] = [
     ],
     cta: "Start here",
     featured: false,
-    note: "Ad spend of €300–€10.000 a month is separate, paid by you directly to Meta.",
+    note: "Ad spend of €300–€1.000 a month is separate, paid by you directly to Meta.",
   },
   {
     name: "Growth",
@@ -298,21 +311,6 @@ export const plans: Plan[] = [
     cta: "Most teams pick this",
     featured: true,
     note: "Ad spend of €1.000–€50.000 a month is separate, paid by you directly to Meta.",
-  },
-  {
-    name: "Scale",
-    price: "Custom",
-    cadence: "quoted per quarter",
-    blurb: "For multi-location brands and accounts spending past €50k a month.",
-    features: [
-      "Dedicated creative pod",
-      "On-site production days",
-      "Multi-location creative systems",
-      "Expanded channels beyond Meta",
-      "Quarterly planning workshops",
-    ],
-    cta: "Talk to us",
-    featured: false,
   },
 ];
 

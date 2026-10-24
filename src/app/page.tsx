@@ -27,7 +27,7 @@ export default function HomePage() {
       <Marquee />
       <ServicesPreview />
       <ProcessSection />
-      <WorkPreview />
+      {/* <WorkPreview /> */}
       <WhyUs />
       <Testimonials />
       <CtaBand />

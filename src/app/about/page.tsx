@@ -37,10 +37,11 @@ export default function AboutPage() {
         eyebrow="About"
         title={
           <>
-            A creative shop that
-            <span className="text-brand"> buys its own media</span>
+            <span className="block">A madly creative shop that will</span>
+            <span className="block text-brand">make your ads pop</span>
           </>
         }
+        titleClassName="max-w-5xl"
         lead="Madvertize started because too many good ads died in an inbox between an agency that made them and an agency that spent behind them."
       />
 
@@ -49,8 +50,8 @@ export default function AboutPage() {
           <div className="grid gap-14 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
             <div className="flex flex-col gap-6 text-lg leading-relaxed text-ash">
               <p>
-                We are a small team of editors, designers, strategists and media
-                buyers who sit in the same standup. When an ad underperforms, the
+                We are a small team of editors, designers, and strategists
+                who sit in the same standup. When an ad underperforms, the
                 person who cut it hears about it the same morning as the person
                 who bought it — and the next version is usually live that week.
               </p>
@@ -58,14 +59,7 @@ export default function AboutPage() {
                 That shape decides what we take on. We work with brands that have
                 something real to sell and the appetite to test, from
                 direct-to-consumer products to local service businesses opening
-                their fifth location. We are less useful to companies that need a
-                brand film and nothing else.
-              </p>
-              <p>
-                The output is deliberately unglamorous: video built for the feed,
-                print built for the hand, and a campaign structure you can read
-                without a dashboard tour. If the number goes up, we did our job.
-                If it does not, you will hear that from us first.
+                their fifth location.
               </p>
             </div>
 
