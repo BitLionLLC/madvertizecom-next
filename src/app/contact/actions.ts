@@ -95,6 +95,9 @@ export async function submitEnquiry(
 
   try {
     await sendEnquiryEmail(enquiry);
+    // Successful submissions used to log nothing at all, which made a working
+    // form indistinguishable from one whose request never arrived.
+    console.info(`[madvertize] enquiry delivered from ${email}`);
   } catch (error) {
     console.error("[madvertize] failed to send enquiry", error);
     return { status: "error", message: FAILURE_MESSAGE };
