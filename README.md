@@ -73,8 +73,10 @@ and hands it to [`src/lib/mail.ts`](src/lib/mail.ts), which sends through
 Nodemailer. The email's `Reply-To` is the sender's address, so replying from
 the inbox goes straight back to them.
 
-Copy `.env.example` to `.env.local` (or `.env`) and fill in the mailbox
-settings:
+Copy `.env.example` to `.env` and fill in the mailbox settings. The domain
+runs on Google Workspace, so `SMTP_HOST` is `smtp.gmail.com` and the password
+must be a [Google App Password](https://myaccount.google.com/apppasswords) —
+Google rejects the normal account password over SMTP.
 
 | Variable        | Required | Notes                                                    |
 | --------------- | -------- | -------------------------------------------------------- |
@@ -87,7 +89,10 @@ settings:
 | `ENQUIRY_TO`    | no       | Defaults to `miru@madvertize.com`                          |
 
 These are read at request time, so changing them needs a restart but not a
-rebuild. Never commit the filled-in file — `.gitignore` covers `.env*` and
+rebuild — and a restart really is required. Node keeps variables that were
+loaded earlier, so editing or deleting an env file does not clear them from a
+running `next dev`; a stale value will keep being used until the server is
+restarted. Never commit the filled-in file — `.gitignore` covers `.env*` and
 allows only `.env.example` through.
 
 If a send fails, the form tells the sender to email directly and the error is
