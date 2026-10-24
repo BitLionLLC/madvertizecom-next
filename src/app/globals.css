@@ -130,3 +130,11 @@
     }
   }
 }
+
+@layer components {
+  /* The floating badge is replaced by the attribution line under the contact
+     form, which is what Google asks for when it is hidden. */
+  .grecaptcha-badge {
+    visibility: hidden;
+  }
+}

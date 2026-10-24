@@ -1,12 +1,60 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import Script from "next/script";
+import { useState, useTransition } from "react";
 import { submitEnquiry } from "@/app/contact/actions";
 import { CheckIcon } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { services } from "@/content/site";
-import { initialEnquiryState } from "@/lib/enquiry";
+import {
+  initialEnquiryState,
+  RECAPTCHA_ACTION,
+  RECAPTCHA_FIELD,
+} from "@/lib/enquiry";
 import { cn } from "@/lib/utils";
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (callback: () => void) => void;
+      execute: (
+        siteKey: string,
+        options: { action: string },
+      ) => Promise<string>;
+    };
+  }
+}
+
+// Inlined at build time, so the key has to be set before `next build`.
+const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+
+const TOKEN_TIMEOUT_MS = 8000;
+
+/**
+ * v3 tokens expire after a couple of minutes, so one is minted at submit time
+ * rather than when the form is first shown. Resolves null if the script never
+ * loaded — an ad blocker, usually — and the server decides what that means.
+ */
+function mintRecaptchaToken(key: string) {
+  return new Promise<string | null>((resolve) => {
+    const grecaptcha = window.grecaptcha;
+    if (!grecaptcha) return resolve(null);
+
+    // execute() can hang indefinitely on a misconfigured key, which would
+    // leave the form stuck on "Sending…" with nothing for anyone to act on.
+    const timer = setTimeout(() => resolve(null), TOKEN_TIMEOUT_MS);
+    const settle = (token: string | null) => {
+      clearTimeout(timer);
+      resolve(token);
+    };
+
+    grecaptcha.ready(() => {
+      grecaptcha
+        .execute(key, { action: RECAPTCHA_ACTION })
+        .then(settle, () => settle(null));
+    });
+  });
+}
 
 const budgets = [
   "Under $2,500 / month",
@@ -28,19 +76,45 @@ const emptyValues = {
 };
 
 export function ContactForm() {
-  const [state, formAction, pending] = useActionState(
-    submitEnquiry,
-    initialEnquiryState,
-  );
+  // Deliberately not useActionState: React resets a form once its action
+  // settles, which desynced these controlled inputs and wiped what had been
+  // typed whenever a submission came back with an error.
+  const [state, setState] = useState(initialEnquiryState);
+  const [pending, startTransition] = useTransition();
 
   // React resets an uncontrolled form once the action settles, which would
   // throw away everything typed whenever a submission comes back with an
   // error. Holding the values here keeps them through a failed attempt.
   const [values, setValues] = useState(emptyValues);
   const [interests, setInterests] = useState<string[]>([]);
+  // Covers the gap between the click and the transition starting, while the
+  // reCAPTCHA token is being minted.
+  const [preparing, setPreparing] = useState(false);
+  const busy = pending || preparing;
 
   const set = (field: keyof typeof emptyValues) => (value: string) =>
     setValues((current) => ({ ...current, [field]: value }));
+
+  // Submitting by hand rather than through `action={formAction}`: the token
+  // can only be fetched asynchronously, and it has to be in the FormData
+  // before the action runs.
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    setPreparing(true);
+    try {
+      if (siteKey) {
+        const token = await mintRecaptchaToken(siteKey);
+        if (token) data.set(RECAPTCHA_FIELD, token);
+      }
+      startTransition(async () => {
+        setState(await submitEnquiry(data));
+      });
+    } finally {
+      setPreparing(false);
+    }
+  }
 
   const toggleInterest = (name: string) =>
     setInterests((current) =>
@@ -64,7 +138,15 @@ export function ContactForm() {
   }
 
   return (
-    <form action={formAction} noValidate className="flex flex-col gap-6">
+    <>
+      {siteKey ? (
+        <Script
+          src={`https://www.google.com/recaptcha/api.js?render=${siteKey}`}
+          strategy="afterInteractive"
+        />
+      ) : null}
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+
       {/* Honeypot: hidden from people, irresistible to bots. */}
       <div aria-hidden className="hidden">
         <label htmlFor="website">Website</label>
@@ -193,16 +275,42 @@ export function ContactForm() {
         <Button
           type="submit"
           size="lg"
-          disabled={pending}
+          disabled={busy}
           className="shrink-0 self-start whitespace-nowrap"
         >
-          {pending ? "Sending…" : "Send the brief"}
+          {busy ? "Sending…" : "Send the brief"}
         </Button>
         <p className="text-xs leading-relaxed text-ash">
           We reply within one business day. No sequences, no cold calls.
         </p>
       </div>
-    </form>
+
+      {siteKey ? (
+        // Required wording when the reCAPTCHA badge is hidden.
+        <p className="text-xs leading-relaxed text-ash/70">
+          This site is protected by reCAPTCHA and the Google{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            className="underline hover:text-ash"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://policies.google.com/terms"
+            className="underline hover:text-ash"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Terms of Service
+          </a>{" "}
+          apply.
+          </p>
+        ) : null}
+      </form>
+    </>
   );
 }
 

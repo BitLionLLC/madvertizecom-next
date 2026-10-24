@@ -1,8 +1,9 @@
 "use server";
 
 import { services } from "@/content/site";
-import type { EnquiryState } from "@/lib/enquiry";
+import { RECAPTCHA_FIELD, type EnquiryState } from "@/lib/enquiry";
 import { isMailConfigured, sendEnquiryEmail } from "@/lib/mail";
+import { isRecaptchaConfigured, verifyRecaptcha } from "@/lib/recaptcha";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const serviceNames = new Set(services.map((service) => service.name));
@@ -10,8 +11,13 @@ const serviceNames = new Set(services.map((service) => service.name));
 const SUCCESS_MESSAGE =
   "Thanks — your brief is in. We reply to every enquiry within one business day.";
 
+const FAILURE_MESSAGE =
+  "Something went wrong sending that. Please email miru@madvertize.com directly.";
+
+const UNVERIFIED_MESSAGE =
+  "We could not verify that submission. Please try again, or email miru@madvertize.com directly.";
+
 export async function submitEnquiry(
-  _prev: EnquiryState,
   formData: FormData,
 ): Promise<EnquiryState> {
   // Hidden field; only a bot fills it in.
@@ -50,6 +56,21 @@ export async function submitEnquiry(
     };
   }
 
+  if (isRecaptchaConfigured()) {
+    const token = String(formData.get(RECAPTCHA_FIELD) ?? "");
+    const verdict = await verifyRecaptcha(token);
+
+    if (!verdict.ok) {
+      console.warn("[madvertize] reCAPTCHA rejected a submission:", verdict.reason);
+      return { status: "error", message: UNVERIFIED_MESSAGE };
+    }
+  } else {
+    // The honeypot still applies. Failing closed here would take the contact
+    // form down entirely whenever the keys are missing, which is worse than
+    // accepting unverified enquiries.
+    console.warn("[madvertize] reCAPTCHA not configured — submission unverified");
+  }
+
   const enquiry = { name, email, company, budget, interests, message };
 
   if (!isMailConfigured()) {
@@ -66,22 +87,14 @@ export async function submitEnquiry(
     }
 
     console.error("[madvertize] SMTP not configured; enquiry not delivered");
-    return {
-      status: "error",
-      message:
-        "Something went wrong sending that. Please email miru@madvertize.com directly.",
-    };
+    return { status: "error", message: FAILURE_MESSAGE };
   }
 
   try {
     await sendEnquiryEmail(enquiry);
   } catch (error) {
     console.error("[madvertize] failed to send enquiry", error);
-    return {
-      status: "error",
-      message:
-        "Something went wrong sending that. Please email miru@madvertize.com directly.",
-    };
+    return { status: "error", message: FAILURE_MESSAGE };
   }
 
   return { status: "success", message: SUCCESS_MESSAGE };
