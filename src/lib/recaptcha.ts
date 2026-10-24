@@ -1,23 +1,17 @@
-import { RECAPTCHA_ACTION } from "@/lib/enquiry";
-
 const VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
-const DEFAULT_MIN_SCORE = 0.5;
 
 type SiteVerifyResponse = {
   success: boolean;
-  score?: number;
-  action?: string;
+  hostname?: string;
   "error-codes"?: string[];
 };
 
-export type VerifyResult =
-  | { ok: true; score: number | null }
-  | { ok: false; reason: string };
+export type VerifyResult = { ok: true } | { ok: false; reason: string };
 
 /**
  * Both keys are needed for the check to mean anything: without the site key the
- * browser cannot mint a token, and without the secret the server cannot judge
- * one.
+ * browser cannot render the checkbox, and without the secret the server cannot
+ * judge the token it produces.
  */
 export function isRecaptchaConfigured() {
   return Boolean(
@@ -26,6 +20,10 @@ export function isRecaptchaConfigured() {
   );
 }
 
+/**
+ * Checks a reCAPTCHA v2 checkbox token. v2 has no score and no action — a
+ * token is either valid, already spent, expired, or from another site key.
+ */
 export async function verifyRecaptcha(token: string): Promise<VerifyResult> {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
   if (!secret) return { ok: false, reason: "no secret key configured" };
@@ -59,18 +57,5 @@ export async function verifyRecaptcha(token: string): Promise<VerifyResult> {
     return { ok: false, reason: `rejected${codes ? `: ${codes}` : ""}` };
   }
 
-  // A token minted for another action would mean it was lifted from elsewhere.
-  if (payload.action && payload.action !== RECAPTCHA_ACTION) {
-    return { ok: false, reason: `unexpected action "${payload.action}"` };
-  }
-
-  const parsedMin = Number(process.env.RECAPTCHA_MIN_SCORE);
-  const minScore = Number.isFinite(parsedMin) ? parsedMin : DEFAULT_MIN_SCORE;
-  const score = typeof payload.score === "number" ? payload.score : null;
-
-  if (score !== null && score < minScore) {
-    return { ok: false, reason: `score ${score} below threshold ${minScore}` };
-  }
-
-  return { ok: true, score };
+  return { ok: true };
 }

@@ -14,8 +14,5 @@ export type EnquiryState = {
 
 export const initialEnquiryState: EnquiryState = { status: "idle", message: "" };
 
-/** Shared by the browser that mints the token and the server that checks it. */
-export const RECAPTCHA_ACTION = "contact_enquiry";
-
 /** Name of the hidden form field carrying the reCAPTCHA token. */
 export const RECAPTCHA_FIELD = "recaptchaToken";

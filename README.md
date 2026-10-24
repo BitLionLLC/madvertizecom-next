@@ -105,31 +105,29 @@ locally, while production returns the error.
 Two layers, both in [`src/app/contact/actions.ts`](src/app/contact/actions.ts):
 
 - A honeypot field that people never see and bots tend to fill in.
-- Google reCAPTCHA v3, which is invisible. The browser mints a token at submit
-  time, and [`src/lib/recaptcha.ts`](src/lib/recaptcha.ts) checks it against
-  Google, rejecting anything whose action does not match or whose score falls
-  below `RECAPTCHA_MIN_SCORE` (0.5 by default). Raise the threshold if spam
-  still gets through; lower it if real enquiries are being turned away.
+- Google reCAPTCHA v2 — the "I'm not a robot" checkbox, rendered above the
+  send button. [`src/lib/recaptcha.ts`](src/lib/recaptcha.ts) checks the
+  token against Google on submit.
 
-| Variable                         | Required | Notes                                        |
-| -------------------------------- | -------- | -------------------------------------------- |
-| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | no       | Needed at build time, not just at runtime     |
-| `RECAPTCHA_SECRET_KEY`           | no       | Server-side only                              |
-| `RECAPTCHA_MIN_SCORE`            | no       | Lowest score still treated as human           |
+The keys must be **v2** keys. A v3 key fails verification with
+`browser-error`, because v3 uses a different client flow entirely.
+
+| Variable                         | Required | Notes                                    |
+| -------------------------------- | -------- | ---------------------------------------- |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | no       | Needed at build time, not just at runtime |
+| `RECAPTCHA_SECRET_KEY`           | no       | Server-side only                          |
 
 With both keys unset the form still works and only the honeypot applies; the
 server logs a warning on every submission. That is deliberate — failing closed
 would take the contact form down entirely whenever the keys go missing.
 
 A submission that cannot be verified is refused with a message pointing at the
-direct email address, and whatever was typed stays in the form. That includes
-visitors whose ad blocker stops Google's script from loading, which is the main
-cost of running v3 here.
+direct email address, and whatever was typed stays in the form. A v2 token is
+single use, so the widget is reset after any failed attempt.
 
-The floating reCAPTCHA badge is hidden in
-[`globals.css`](src/app/globals.css), so the attribution line under the form
-carries the disclosure Google requires. If you remove that line, unhide the
-badge.
+If Google's script is blocked — an ad blocker, usually — the checkbox never
+appears. After 15 seconds the form says so and names the direct email address
+instead of leaving a blank gap above the button.
 
 ## Notes on Next.js 16
 
