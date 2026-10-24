@@ -1,0 +1,8 @@
+[build.environment]
+  # Secrets scanning flags SMTP_HOST and SMTP_USER, but neither is a secret and
+  # neither can be kept out of the build:
+  #   SMTP_HOST (smtp.gmail.com) ships inside nodemailer's own well-known
+  #   service list, so it is in node_modules of every build.
+  #   SMTP_USER is the published contact address, rendered on every page.
+  # SMTP_PASSWORD and RECAPTCHA_SECRET_KEY are still scanned.
+  SECRETS_SCAN_OMIT_KEYS = "SMTP_HOST,SMTP_USER"
