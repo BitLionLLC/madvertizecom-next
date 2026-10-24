@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #08080a;
+  --color-ink-raised: #101014;
+  --color-ink-line: #26262d;
+  --color-bone: #f6f5f4;
+  --color-ash: #a1a1aa;
+
+  --color-brand: #e11d2e;
+  --color-brand-bright: #ff3d4f;
+  --color-brand-deep: #7f0f1a;
+
+  --font-display: var(--font-anton), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-bright);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Heavy condensed display type, used for headlines across the site. */
+  .headline {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  /* Faint red-on-black grid, sits behind hero and CTA bands. */
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--color-brand) 11%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--color-brand) 11%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 20%, transparent 75%);
+  }
+
+  .brand-glow {
+    background: radial-gradient(
+      ellipse 55% 50% at 50% 0%,
+      color-mix(in oklab, var(--color-brand) 38%, transparent),
+      transparent 70%
+    );
+  }
+}
+
+@layer utilities {
+  .text-stroke {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--color-ink-line);
+  }
+
+  /* Starting state for <Reveal>; the observer swaps it for .reveal-shown. */
+  .reveal-pending {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  /* Without JS the observer never runs, so never hide anything. */
+  @media (scripting: none) {
+    .reveal-pending {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .reveal-shown {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s var(--ease-out-soft),
+      transform 0.7s var(--ease-out-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-pending,
+    .reveal-shown {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
+
+@layer components {
+  /* Edge-to-edge capability ticker. The track holds two copies of the list,
+     so a -50% translation loops seamlessly. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+}
