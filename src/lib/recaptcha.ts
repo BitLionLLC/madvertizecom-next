@@ -7,6 +7,8 @@ type SiteVerifyResponse = {
   success: boolean;
   score?: number;
   action?: string;
+  hostname?: string;
+  challenge_ts?: string;
   "error-codes"?: string[];
 };
 
@@ -55,8 +57,9 @@ export async function verifyRecaptcha(token: string): Promise<VerifyResult> {
   }
 
   if (!payload.success) {
-    const codes = payload["error-codes"]?.join(", ");
-    return { ok: false, reason: `rejected${codes ? `: ${codes}` : ""}` };
+    // The whole payload, because the error code alone rarely says enough:
+    // `hostname` shows which origin Google saw, which is the usual culprit.
+    return { ok: false, reason: `rejected ${JSON.stringify(payload)}` };
   }
 
   // A token minted for another action would mean it was lifted from elsewhere.

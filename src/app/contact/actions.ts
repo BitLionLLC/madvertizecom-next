@@ -61,7 +61,10 @@ export async function submitEnquiry(
     const verdict = await verifyRecaptcha(token);
 
     if (!verdict.ok) {
-      console.warn("[madvertize] reCAPTCHA rejected a submission:", verdict.reason);
+      console.warn(
+        `[madvertize] reCAPTCHA rejected a submission (token length ${token.length}):`,
+        verdict.reason,
+      );
       return { status: "error", message: UNVERIFIED_MESSAGE };
     }
   } else {

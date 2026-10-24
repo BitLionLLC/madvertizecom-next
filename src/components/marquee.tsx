@@ -1,14 +1,13 @@
 const items = [
   "Reels & Shorts ads",
-  "UGC creative",
   "Product films",
   "Motion graphics",
   "Flyers & posters",
   "Direct mail",
   "Meta Ads management",
   "Creative testing",
-  "Offer strategy",
   "Weekly reporting",
+  "Video editing"
 ];
 
 export function Marquee() {
